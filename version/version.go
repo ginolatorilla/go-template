@@ -2,6 +2,7 @@
 Package version contains the version information of the application.
 
 These variables are set during the build process.
+  - AppName
   - Version
   - CommitHash
 */
