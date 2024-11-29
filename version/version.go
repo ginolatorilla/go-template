@@ -1,7 +1,7 @@
 /*
-Package version contains the version information of the application.
+Package version contains the build metadata of the application.
 
-These variables are set during the build process.
+These variables can be overriden with linker flags during the build process.
   - AppName
   - Version
   - CommitHash
@@ -9,7 +9,7 @@ These variables are set during the build process.
 package version
 
 var (
-	AppName    = "" // Name of the application
-	Version    = "" // Version of the application
-	CommitHash = "" // Commit hash of the application
+	AppName    = "go-template" // Name of the application
+	Version    = ""            // Version of the application
+	CommitHash = ""            // Commit hash of the application
 )
