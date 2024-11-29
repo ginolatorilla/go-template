@@ -10,26 +10,29 @@ PACKAGE=$(GITHUB_DOMAIN)/$(GITHUB_OWNER)/$(APP)
 BUILD_FLAGS=-v -buildvcs 
 LD_FLAGS=-ldflags="-X '$(PACKAGE)/version.AppName=$(APP)' -X '$(PACKAGE)/version.Version=$(VERSION)' -X '$(PACKAGE)/version.CommitHash=$(COMMIT_HASH)'"
 
-
 .PHONY: all
 all: test tidy build
 
 .PHONY: test
 test:
-	go test -race $(BUILD_FLAGS) $(LD_FLAGS) ./...
+	@echo "🌡  Running tests..."
+	@go test -race $(BUILD_FLAGS) $(LD_FLAGS) ./...
 
 .PHONY: test/cover
 test/cover:
-	go test -coverprofile=/tmp/coverage.out -race $(BUILD_FLAGS) $(LD_FLAGS) ./...
-	go tool cover -html=/tmp/coverage.out
+	@echo "🌡️  Running tests..."
+	@go test -coverprofile=/tmp/coverage.out -race $(BUILD_FLAGS) $(LD_FLAGS) ./...
+	@go tool cover -html=/tmp/coverage.out
 
 .PHONY: tidy
 tidy:
-	go mod tidy
+	@echo "🧹 Tidying up package dependencies..."
+	@go mod tidy
 
 .PHONY: build
 build:
-	go build $(BUILD_FLAGS) $(LD_FLAGS) -o bin/$(APP) $(PACKAGE) 
+	@echo "🏗️  Building the application..."
+	@go build $(BUILD_FLAGS) $(LD_FLAGS) -o bin/$(APP) $(PACKAGE) 
 
 .PHONY: clean
 clean:
