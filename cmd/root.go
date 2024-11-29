@@ -28,9 +28,15 @@ import (
 	"github.com/ginolatorilla/go-template/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-var cfgFile string
+// rootCmdOptions contains the parsed command line arguments, which can be used by commands.
+var rootCmdOptions struct {
+	ConfigFile string
+	Verbosity  int
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -42,9 +48,6 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -57,24 +60,49 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initLogger)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is $HOME/.%s.yaml)", version.AppName))
+	rootCmd.PersistentFlags().StringVar(
+		&rootCmdOptions.ConfigFile,
+		"config",
+		"",
+		fmt.Sprintf("Read configuration from this file (default is $HOME/.%s.yaml)", version.AppName),
+	)
+	rootCmd.PersistentFlags().CountVarP(
+		&rootCmdOptions.Verbosity,
+		"verbose",
+		"v",
+		"Verbosity level. Use -v for verbose, -vv for more verbose, etc.",
+	)
+}
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+func initLogger() {
+	var level zapcore.Level
+	switch rootCmdOptions.Verbosity {
+	case 0:
+		level = zap.WarnLevel
+	case 1:
+		level = zap.InfoLevel
+	default:
+		level = zap.DebugLevel
+	}
+
+	config := zap.NewDevelopmentConfig()
+	config.Level = zap.NewAtomicLevelAt(level)
+	logger := zap.Must(config.Build())
+	defer logger.Sync()
+	zap.ReplaceGlobals(logger)
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
+	if rootCmdOptions.ConfigFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(rootCmdOptions.ConfigFile)
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
