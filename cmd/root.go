@@ -104,6 +104,7 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(rootCmdOptions.ConfigFile)
 	} else {
+		zap.S().Debug("No config file specified, searching for default config file")
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
@@ -118,6 +119,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		zap.S().Info("Using config file:", viper.ConfigFileUsed())
 	}
 }
