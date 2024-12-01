@@ -1,24 +1,6 @@
-/*
-Copyright © 2024 Gino Latorilla
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
+// Package cmd provides the command line interface for the application.
+//
+// Copyright © 2024 Gino Latorilla
 package cmd
 
 import (
@@ -32,57 +14,52 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// rootCmdOptions contains the parsed command line arguments, which can be used by commands.
-var rootCmdOptions struct {
-	ConfigFile string
-	Verbosity  int
+type CLI struct {
+	rootCmd    *cobra.Command
+	configFile string
+	verbosity  int
 }
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   version.AppName,
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
+func NewCLIApp() (*CLI, error) {
+	var cli CLI
+	cli.buildRootCommand()
+	cli.buildVersionCommand()
+	cli.setUpLogger()
+	if err := cli.configure(); err != nil {
+		return nil, fmt.Errorf("failed to configure CLI: %w", err)
+	}
+	return &cli, nil
+}
+
+func (cli *CLI) buildRootCommand() {
+	cli.rootCmd = &cobra.Command{
+		Use:   version.AppName,
+		Short: "A brief description of your application",
+		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
 	}
-}
 
-func init() {
-	cobra.OnInitialize(initLogger, initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	rootCmd.PersistentFlags().StringVar(
-		&rootCmdOptions.ConfigFile,
+	cli.rootCmd.PersistentFlags().StringVar(
+		&cli.configFile,
 		"config",
 		"",
 		fmt.Sprintf("Read configuration from this file (default is $HOME/.%s.yaml)", version.AppName),
 	)
-	rootCmd.PersistentFlags().CountVarP(
-		&rootCmdOptions.Verbosity,
+	cli.rootCmd.PersistentFlags().CountVarP(
+		&cli.verbosity,
 		"verbose",
 		"v",
 		"Verbosity level. Use -v for verbose, -vv for more verbose, etc.",
 	)
 }
 
-func initLogger() {
+func (cli *CLI) setUpLogger() {
 	var level zapcore.Level
-	switch rootCmdOptions.Verbosity {
+	switch cli.verbosity {
 	case 0:
 		level = zap.WarnLevel
 	case 1:
@@ -98,16 +75,17 @@ func initLogger() {
 	zap.ReplaceGlobals(logger)
 }
 
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if rootCmdOptions.ConfigFile != "" {
+func (cli *CLI) configure() error {
+	if cli.configFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(rootCmdOptions.ConfigFile)
+		viper.SetConfigFile(cli.configFile)
 	} else {
 		zap.S().Debug("No config file specified, searching for default config file")
 		// Find home directory.
 		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
+		if err != nil {
+			return fmt.Errorf("failed to get user home directory: %w", err)
+		}
 
 		// Search config in home directory with name ".go-template" (without extension).
 		viper.AddConfigPath(home)
@@ -121,4 +99,10 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		zap.S().Info("Using config file:", viper.ConfigFileUsed())
 	}
+
+	return nil
+}
+
+func (cli *CLI) Execute() error {
+	return cli.rootCmd.Execute()
 }

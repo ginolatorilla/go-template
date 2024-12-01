@@ -1,11 +1,11 @@
-/*
-Package version contains the build metadata of the application.
-
-These variables can be overriden with linker flags during the build process.
-  - AppName
-  - Version
-  - CommitHash
-*/
+// Package version contains the build metadata of the application.
+//
+// These variables can be overriden with linker flags during the build process.
+//   - AppName
+//   - Version
+//   - CommitHash
+//
+// Copyright © 2024 Gino Latorilla
 package version
 
 var (
