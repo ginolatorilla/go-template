@@ -39,6 +39,10 @@ clean:
 	go clean
 	rm -rf bin/*
 
+.PHONY: doc
+doc:
+	pkgsite -open
+
 .PHONY: help
 help:
 	@echo "Usage: make <target>"
@@ -51,3 +55,4 @@ help:
 	@echo "  tidy       - Sort out package dependencies"
 	@echo "  build      - Build the application"
 	@echo "  clean      - Clean up the build artifacts"
+	@echo "  doc        - Open the documentation in the browser"

@@ -9,10 +9,12 @@ A Go project template for command line applications.
 - Makefile with useful targets (see them by calling `make help`)
 - Embed build information, such as version and git commit hashes, at build time
 - Structured logging with [Zap](https://pkg.go.dev/go.uber.org/zap)
+- Serve documentation generated from comments
 
 ## Requirements
 
 - [Go](https://go.dev/doc/install)
+- [pkgsite](golang.org/x/pkgsite/cmd/pkgsite)
 
 ## Demo
 
