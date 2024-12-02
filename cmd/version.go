@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// buildVersionCommand creates the version command.
 func (cli *CLI) buildVersionCommand() {
 	command := &cobra.Command{
 		Use:   "version",

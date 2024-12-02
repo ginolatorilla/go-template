@@ -22,14 +22,14 @@ type CLI struct {
 }
 
 // NewCLIApp creates a new CLI application.
+//
+// This is where you need to call every other build*Command method.
 func NewCLIApp() (*CLI, error) {
 	var cli CLI
 	cli.buildRootCommand()
+
+	// Register commands here. The build*Command functions must register themselves with the root command.
 	cli.buildVersionCommand()
-	cli.setUpLogger()
-	if err := cli.configure(); err != nil {
-		return nil, fmt.Errorf("failed to configure CLI: %w", err)
-	}
 	return &cli, nil
 }
 
@@ -40,6 +40,7 @@ func (cli *CLI) Execute() error {
 	return cli.rootCmd.Execute()
 }
 
+// buildRootCommand creates the root command for the CLI application.
 func (cli *CLI) buildRootCommand() {
 	cli.rootCmd = &cobra.Command{
 		Use:   version.AppName,
@@ -64,8 +65,15 @@ to quickly create a Cobra application.`,
 		"v",
 		"Verbosity level. Use -v for verbose, -vv for more verbose, etc.",
 	)
+
+	// Have to be here because we need to run these functions when the root command parses its flags
+	// and before it runs any subcommands.
+	cobra.OnInitialize(cli.setUpLogger, cli.configure)
 }
 
+// setUpLogger sets up the logger based on the verbosity level.
+//
+// This function mimics the default logging level of Python's logger (starts at WARNING).
 func (cli *CLI) setUpLogger() {
 	var level zapcore.Level
 	switch cli.verbosity {
@@ -84,7 +92,8 @@ func (cli *CLI) setUpLogger() {
 	zap.ReplaceGlobals(logger)
 }
 
-func (cli *CLI) configure() error {
+// configure reads application options from a file and environment variables.
+func (cli *CLI) configure() {
 	if cli.configFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cli.configFile)
@@ -93,10 +102,9 @@ func (cli *CLI) configure() error {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		if err != nil {
-			return fmt.Errorf("failed to get user home directory: %w", err)
+			zap.S().Fatalf("failed to get user home directory: %w", err)
 		}
 
-		// Search config in home directory with name ".go-template" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(fmt.Sprintf(".%s", version.AppName))
@@ -108,6 +116,4 @@ func (cli *CLI) configure() error {
 	if err := viper.ReadInConfig(); err == nil {
 		zap.S().Info("Using config file:", viper.ConfigFileUsed())
 	}
-
-	return nil
 }
