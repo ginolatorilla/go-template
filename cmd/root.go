@@ -14,12 +14,14 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// CLI represents the command line interface for the application.
 type CLI struct {
 	rootCmd    *cobra.Command
 	configFile string
 	verbosity  int
 }
 
+// NewCLIApp creates a new CLI application.
 func NewCLIApp() (*CLI, error) {
 	var cli CLI
 	cli.buildRootCommand()
@@ -29,6 +31,13 @@ func NewCLIApp() (*CLI, error) {
 		return nil, fmt.Errorf("failed to configure CLI: %w", err)
 	}
 	return &cli, nil
+}
+
+// Execute runs the CLI application.
+//
+// This parses all command line arguments and executes the command's Run function.
+func (cli *CLI) Execute() error {
+	return cli.rootCmd.Execute()
 }
 
 func (cli *CLI) buildRootCommand() {
@@ -101,8 +110,4 @@ func (cli *CLI) configure() error {
 	}
 
 	return nil
-}
-
-func (cli *CLI) Execute() error {
-	return cli.rootCmd.Execute()
 }
