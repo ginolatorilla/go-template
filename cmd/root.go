@@ -23,19 +23,19 @@ type CLI struct {
 
 // NewCLIApp creates a new CLI application.
 //
-// This is where you need to call every other build*Command method.
-func NewCLIApp() (*CLI, error) {
+// This is where you need to call every other [build*Command] method.
+func NewCLIApp() *CLI {
 	var cli CLI
 	cli.buildRootCommand()
 
 	// Register commands here. The build*Command functions must register themselves with the root command.
 	cli.buildVersionCommand()
-	return &cli, nil
+	return &cli
 }
 
 // Execute runs the CLI application.
 //
-// This parses all command line arguments and executes the command's Run function.
+// This parses all command line arguments and executes the command's *Run* function.
 func (cli *CLI) Execute() error {
 	return cli.rootCmd.Execute()
 }
@@ -51,6 +51,12 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			// This function is a placeholder only to visually check if logging works.
+			zap.S().Warn("Hello, World!")
+			zap.S().Info("Hello, World!")
+			zap.S().Debug("Hello, World!")
+		},
 	}
 
 	cli.rootCmd.PersistentFlags().StringVar(

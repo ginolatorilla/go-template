@@ -25,12 +25,7 @@ import (
 )
 
 func main() {
-	app, err := cmd.NewCLIApp()
-	if err != nil {
-		zap.S().Fatalf("failed to create CLI app: %v", err)
-	}
-
-	if err := app.Execute(); err != nil {
+	if err := cmd.NewCLIApp().Execute(); err != nil {
 		zap.S().Fatalf("failed to execute CLI app: %v", err)
 	}
 }
