@@ -108,7 +108,7 @@ func (cli *CLI) configure() {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		if err != nil {
-			zap.S().Fatalf("failed to get user home directory: %w", err)
+			zap.S().Fatalf("failed to get user home directory: %v", err)
 		}
 
 		viper.AddConfigPath(home)
