@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ginolatorilla/go-template/cmd"
-	"github.com/ginolatorilla/go-template/version"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +28,7 @@ func Test_Config(t *testing.T) {
 }
 
 func runCommand(args ...string) error {
-	os.Args = append([]string{version.AppName}, args...)
+	os.Args = append([]string{cmd.AppName}, args...)
 	cli := cmd.NewCLIApp()
 	return cli.Execute()
 }

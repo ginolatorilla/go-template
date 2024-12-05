@@ -8,7 +8,7 @@ COMMIT_HASH=$(shell git rev-parse HEAD)
 PACKAGE=$(GITHUB_DOMAIN)/$(GITHUB_OWNER)/$(APP)
 
 BUILD_FLAGS=-v -buildvcs 
-LD_FLAGS=-ldflags="-X '$(PACKAGE)/version.AppName=$(APP)' -X '$(PACKAGE)/version.Version=$(VERSION)' -X '$(PACKAGE)/version.CommitHash=$(COMMIT_HASH)'"
+LD_FLAGS=-ldflags="-X '$(PACKAGE)/cmd.AppName=$(APP)' -X '$(PACKAGE)/cmd.Version=$(VERSION)' -X '$(PACKAGE)/cmd.CommitHash=$(COMMIT_HASH)'"
 
 .PHONY: all
 all: test tidy build

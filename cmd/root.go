@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ginolatorilla/go-template/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -43,7 +42,7 @@ func (cli *CLI) Execute() error {
 // buildRootCommand creates the root command for the CLI application.
 func (cli *CLI) buildRootCommand() {
 	cli.rootCmd = &cobra.Command{
-		Use:   version.AppName,
+		Use:   AppName,
 		Short: "A brief description of your application",
 		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -63,7 +62,7 @@ to quickly create a Cobra application.`,
 		&cli.configFile,
 		"config",
 		"",
-		fmt.Sprintf("Read configuration from this file (default is $HOME/.%s.yaml)", version.AppName),
+		fmt.Sprintf("Read configuration from this file (default is $HOME/.%s.yaml)", AppName),
 	)
 	cli.rootCmd.PersistentFlags().CountVarP(
 		&cli.verbosity,
@@ -113,7 +112,7 @@ func (cli *CLI) configure() {
 
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(fmt.Sprintf(".%s", version.AppName))
+		viper.SetConfigName(fmt.Sprintf(".%s", AppName))
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

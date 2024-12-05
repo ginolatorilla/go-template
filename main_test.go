@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/ginolatorilla/go-template/version"
+	"github.com/ginolatorilla/go-template/cmd"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ import (
 // The runMainInSubProcess function delegates to this function, passing arguments as necessary.
 func Test_main(t *testing.T) {
 	if os.Getenv("GO_TEST_SUBPROCESS") != "" {
-		os.Args = append([]string{version.AppName}, extractMainSubProcessArgs(os.Args)...)
+		os.Args = append([]string{cmd.AppName}, extractMainSubProcessArgs(os.Args)...)
 	}
 
 	main()
