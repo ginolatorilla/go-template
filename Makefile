@@ -9,30 +9,31 @@ PACKAGE=$(GITHUB_DOMAIN)/$(GITHUB_OWNER)/$(APP)
 
 BUILD_FLAGS=-v -buildvcs 
 LD_FLAGS=-ldflags="-X '$(PACKAGE)/cmd.AppName=$(APP)' -X '$(PACKAGE)/cmd.Version=$(VERSION)' -X '$(PACKAGE)/cmd.CommitHash=$(COMMIT_HASH)'"
+TEST_REGEX=".*"
 
 .PHONY: all
-all: test tidy build
+all: test build
 
 .PHONY: test
-test:
+test: tidy
 	@echo "🌡  Running tests..."
-	@go test -race $(BUILD_FLAGS) $(LD_FLAGS) ./...
+	go test -race $(BUILD_FLAGS) $(LD_FLAGS) -run $(TEST_REGEX) ./...
 
 .PHONY: test/cover
-test/cover:
+test/cover: tidy
 	@echo "🌡️  Running tests..."
-	@go test -coverprofile=/tmp/coverage.out -race $(BUILD_FLAGS) $(LD_FLAGS) ./...
+	@go test -coverprofile=/tmp/coverage.out -race $(BUILD_FLAGS) $(LD_FLAGS) -run $(TEST_REGEX) ./...
 	@go tool cover -html=/tmp/coverage.out
 
 .PHONY: tidy
 tidy:
 	@echo "🧹 Tidying up package dependencies..."
-	@go mod tidy
+	go mod tidy
 
 .PHONY: build
 build:
 	@echo "🏗️  Building the application..."
-	@go build $(BUILD_FLAGS) $(LD_FLAGS) -o bin/$(APP) $(PACKAGE) 
+	go build $(BUILD_FLAGS) $(LD_FLAGS) -o bin/$(APP) $(PACKAGE) 
 
 .PHONY: clean
 clean:
@@ -43,13 +44,19 @@ clean:
 doc:
 	pkgsite -open
 
+.PHONY: install
+install: all
+	@go install $(BUILD_FLAGS) $(LD_FLAGS) $(PACKAGE)
+	@echo "🚀 Installed to $(shell which $(APP))"
+
 .PHONY: help
 help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Targets:"
-	@echo "  all        - Run test, tidy, and build (default)"
 	@echo "  help       - Show this help message"
+	@echo "  all        - Run test, tidy, and build (default)"
+	@echo "  install    - Install the application"
 	@echo "  test       - Run tests"
 	@echo "  test/cover - Run tests with coverage"
 	@echo "  tidy       - Sort out package dependencies"
