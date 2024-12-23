@@ -10,6 +10,7 @@ PACKAGE=$(GITHUB_DOMAIN)/$(GITHUB_OWNER)/$(APP)
 BUILD_FLAGS=-v -buildvcs 
 LD_FLAGS=-ldflags="-X '$(PACKAGE)/cmd.AppName=$(APP)' -X '$(PACKAGE)/cmd.Version=$(VERSION)' -X '$(PACKAGE)/cmd.CommitHash=$(COMMIT_HASH)'"
 TEST_REGEX=".*"
+TEST_PACKAGE="./..."
 
 .PHONY: all
 all: test build
@@ -17,12 +18,12 @@ all: test build
 .PHONY: test
 test: tidy
 	@echo "🌡  Running tests..."
-	go test -race $(BUILD_FLAGS) $(LD_FLAGS) -run $(TEST_REGEX) ./...
+	go test -race $(BUILD_FLAGS) $(LD_FLAGS) -run $(TEST_REGEX) $(TEST_PACKAGE)
 
 .PHONY: test/cover
 test/cover: tidy
 	@echo "🌡️  Running tests..."
-	@go test -coverprofile=/tmp/coverage.out -race $(BUILD_FLAGS) $(LD_FLAGS) -run $(TEST_REGEX) ./...
+	@go test -coverprofile=/tmp/coverage.out -race $(BUILD_FLAGS) $(LD_FLAGS) -run $(TEST_REGEX) $(TEST_PACKAGE)
 	@go tool cover -html=/tmp/coverage.out
 
 .PHONY: tidy
@@ -42,7 +43,8 @@ clean:
 
 .PHONY: doc
 doc:
-	pkgsite -open
+	@go install golang.org/x/pkgsite/cmd/pkgsite@latest
+	@pkgsite -open
 
 .PHONY: install
 install: all

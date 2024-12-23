@@ -14,7 +14,6 @@ A Go project template for command line applications.
 ## Requirements
 
 - [Go](https://go.dev/doc/install)
-- [pkgsite](golang.org/x/pkgsite/cmd/pkgsite)
 
 ## Demo
 
