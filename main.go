@@ -21,11 +21,8 @@ package main
 
 import (
 	"github.com/ginolatorilla/go-template/cmd"
-	"go.uber.org/zap"
 )
 
 func main() {
-	if err := cmd.NewCLIApp().Execute(); err != nil {
-		zap.S().Fatalf("failed to execute CLI app: %v", err)
-	}
+	cmd.Execute()
 }
