@@ -3,6 +3,7 @@ package root
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	u "github.com/ginolatorilla/go-template/pkg/utils"
 	"github.com/spf13/cobra"
@@ -33,7 +34,7 @@ to quickly create a Cobra application.`,
 			defer zap.S().Sync()
 			zap.S().Warn("Hello, World!")
 			zap.S().Info("Hello, World!")
-			zap.S().Debug("Hello, World!")
+			zap.S().Debug("Hello, World!", viper.GetString("test"))
 		},
 	}
 
@@ -49,6 +50,13 @@ to quickly create a Cobra application.`,
 		"v",
 		"Verbosity level. Use -v for verbose, -vv for more verbose, etc.",
 	)
+	cmd.Flags().String(
+		"test",
+		"not-set",
+		"A flag that is read from the command line, config, or env var.",
+	)
+	viper.BindPFlag("test", cmd.Flags().Lookup("test"))
+
 	return cmd
 }
 
@@ -93,7 +101,10 @@ func configure(configFile, appName string) {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(fmt.Sprintf(".%s", appName))
 
+	viper.SetEnvPrefix(appName)
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
+
 	if err := viper.ReadInConfig(); err == nil {
 		zap.S().Info("Using config file:", viper.ConfigFileUsed())
 	}
