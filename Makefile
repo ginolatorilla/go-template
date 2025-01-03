@@ -48,8 +48,7 @@ doc:
 
 .PHONY: install
 install: all
-	@go install $(BUILD_FLAGS) $(LD_FLAGS) $(PACKAGE)
-	@echo "🚀 Installed to $(shell which $(APP))"
+	go install $(BUILD_FLAGS) $(LD_FLAGS) $(PACKAGE)
 
 .PHONY: help
 help:
