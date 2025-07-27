@@ -4,10 +4,9 @@
 package cmd
 
 import (
+	"github.com/ginolatorilla/core"
 	"github.com/ginolatorilla/go-template/cmd/root"
 	"github.com/ginolatorilla/go-template/cmd/version"
-
-	u "github.com/ginolatorilla/go-template/pkg/utils"
 )
 
 var (
@@ -19,5 +18,5 @@ var (
 func Execute() {
 	cmd := root.NewCommand(AppName)
 	cmd.AddCommand(version.NewCommand(Version, CommitHash))
-	u.Check(cmd.Execute())
+	core.Check(cmd.Execute())
 }
