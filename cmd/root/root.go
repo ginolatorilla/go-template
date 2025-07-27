@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	u "github.com/ginolatorilla/go-template/pkg/utils"
+	"github.com/ginolatorilla/core"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -96,7 +96,7 @@ func configure(configFile, appName string) {
 	}
 
 	zap.S().Debug("No config file specified, searching for default config file")
-	home := u.Must(os.UserHomeDir())
+	home := core.Must(os.UserHomeDir())
 	viper.AddConfigPath(home)
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(fmt.Sprintf(".%s", appName))
